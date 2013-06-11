@@ -2,6 +2,8 @@
 
 # --------------------
 # Object model
+require_relative 'transaction_queue'
+require_relative 'balance_store'
 
 module Currency
   class Money
@@ -16,19 +18,27 @@ module Currency
 end
 
 class Account
-  def credit(amount)
-    @balance = amount
+  def initialize
+    @queue = TransactionQueue.new
+    @balance_store = BalanceStore.new
   end
+  
   def balance
-    @balance
+    @balance_store.balance
   end
+
+  def credit(amount)
+    @queue.write("+#{amount}")
+  end
+
   def debit(amount)
-    if balance >= amount
-      @balance -= amount
-      return true
-    else
-      return false
-    end
+    ##if balance >= amount
+    ##  @balance -= amount
+    ##  return true
+    ##else
+    ##  return false
+    ##end
+    @queue.write("-#{amount}")
   end
 end
 
